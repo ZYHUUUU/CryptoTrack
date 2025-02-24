@@ -70,6 +70,11 @@ app.use("/prices", (req, res, next) => {
     next();
 }, priceRoutes);
 
+app.get('/', (req, res) => {
+    res.send('CryptoTracker Backend is Running! 🚀');
+});
+
+
 // 服务器启动
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
