@@ -11,7 +11,7 @@ function TrendingCoins() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://localhost:3000/api/trending");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/trending`);
       const sortedCoins = response.data.coins.sort(
         (a, b) => a.item.market_cap_rank - b.item.market_cap_rank
       );
