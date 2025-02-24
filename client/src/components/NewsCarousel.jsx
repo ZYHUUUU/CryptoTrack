@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import axios from 'axios';
 
 const NewsBoard = () => {
     const [news, setNews] = useState([]);
@@ -7,17 +8,22 @@ const NewsBoard = () => {
     const intervalRef = useRef(null);
 
     useEffect(() => {
+        console.log("🔍 API URL:", process.env.REACT_APP_API_URL); // 确保 API 地址正确
+
         const fetchNews = async () => {
             try {
-                const response = await fetch("http://localhost:5001/api/news");
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    setNews(data);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/news`);
+                console.log("📰 News API Response:", response.data); // 观察 API 响应数据
+
+                if (Array.isArray(response.data)) {
+                    setNews(response.data);
                 } else {
+                    console.error("❌ News API did not return an array:", response.data);
                     setNews([]);
                 }
             } catch (error) {
-                setNews([]);
+                console.error("❌ Failed to fetch news:", error);
+                setNews([]); // 避免 UI 出错
             }
         };
 
@@ -89,40 +95,44 @@ const NewsBoard = () => {
                 />
             </div>
             <div>
-                {currentNews.map((item, index) => (
-                    <div
-                        key={index}
-                        style={{
-                            borderBottom: "1px solid #e0e0e0",
-                            paddingBottom: "0.5rem",
-                            marginBottom: "0.5rem",
-                        }}
-                    >
-                        <p
+                {currentNews.length > 0 ? (
+                    currentNews.map((item, index) => (
+                        <div
+                            key={index}
                             style={{
-                                fontSize: "0.9rem",
-                                color: "white",
-                                margin: 0,
+                                borderBottom: "1px solid #e0e0e0",
+                                paddingBottom: "0.5rem",
+                                marginBottom: "0.5rem",
                             }}
                         >
-                            <span style={{ fontWeight: "bold", color: "white" }}>{item.source}</span> · {new Date(item.published).toLocaleString()}
-                        </p>
-                        <a
-                            href={item.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                                fontSize: "1rem",
-                                textDecoration: "none",
-                                color: "white",
-                                display: "block",
-                                marginTop: "0.5rem",
-                            }}
-                        >
-                            {item.title}
-                        </a>
-                    </div>
-                ))}
+                            <p
+                                style={{
+                                    fontSize: "0.9rem",
+                                    color: "white",
+                                    margin: 0,
+                                }}
+                            >
+                                <span style={{ fontWeight: "bold", color: "white" }}>{item.source}</span> · {new Date(item.published).toLocaleString()}
+                            </p>
+                            <a
+                                href={item.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    fontSize: "1rem",
+                                    textDecoration: "none",
+                                    color: "white",
+                                    display: "block",
+                                    marginTop: "0.5rem",
+                                }}
+                            >
+                                {item.title}
+                            </a>
+                        </div>
+                    ))
+                ) : (
+                    <p style={{ color: "white" }}>No news available.</p>
+                )}
             </div>
             {hovered && (
                 <button

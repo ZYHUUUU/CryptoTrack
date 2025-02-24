@@ -4,6 +4,8 @@ import { getDocs, collection } from "firebase/firestore";
 import { removeFromFavorites } from "./firebaseFunctions";
 import { db } from "../firebase";
 import { getAuth } from "firebase/auth";
+import axios from 'axios';
+
 
 function FavouriteList({ userId, onClose }) {
   const [favourites, setFavourites] = useState([]);
@@ -42,7 +44,8 @@ function FavouriteList({ userId, onClose }) {
   useEffect(() => {
     const fetchCoinList = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/coins");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/coins`);
+
         if (!response.ok) {
           throw new Error(`Failed to fetch coins: ${response.status}`);
         }

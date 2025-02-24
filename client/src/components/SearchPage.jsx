@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import axios from 'axios';
+
 
 const SearchPage = () => {
   const [coin, setCoin] = useState("");
@@ -13,7 +15,8 @@ const SearchPage = () => {
   useEffect(() => {
     const fetchCoinList = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/coins");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/coins`);
+
         if (!response.ok) {
           throw new Error(`Failed to fetch coins: ${response.status}`);
         }

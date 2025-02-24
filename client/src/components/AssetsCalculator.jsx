@@ -11,7 +11,7 @@ const AssetsCalculator = () => {
   useEffect(() => {
     const fetchCoinList = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/coins");
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/coins`);
         setCoinList(response.data);
       } catch (error) {
         console.error("Failed to fetch coin list:", error);
@@ -64,8 +64,8 @@ const AssetsCalculator = () => {
       try {
         const ids = validRows.map((row) => row.coin).join(",");
         const response = await axios.get(
-          `http://localhost:5001/prices/price?ids=${ids}&vs_currency=usd`
-        );
+          `${process.env.REACT_APP_API_URL}/prices/price?ids=${ids}&vs_currency=usd`
+      );      
         const total = validRows.reduce((sum, row) => {
           const price = response.data[row.coin]?.usd || 0;
           return sum + price * parseFloat(row.quantity);
