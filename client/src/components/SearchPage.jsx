@@ -16,20 +16,16 @@ const SearchPage = () => {
     const fetchCoinList = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/coins`);
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch coins: ${response.status}`);
-        }
-        const data = await response.json();
-        setCoinList(data);
+        setCoinList(response.data); // ✅ 直接使用 response.data
       } catch (error) {
         console.error("Failed to fetch coin list:", error);
         alert("Unable to load coin data. Please try again later.");
       }
     };
-
-    fetchCoinList();
+  
+    fetchCoinList(); // ✅ 调用函数
   }, []);
+  
 
   useEffect(() => {
     setCoin("");
