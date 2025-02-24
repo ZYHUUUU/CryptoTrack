@@ -9,13 +9,13 @@ import Login from "./components/Login";
 import Menu from "./components/Menu";
 import Modal from "./components/Modal";
 import FavouriteButton from "./components/FavouriteButton";
+import { SpeedInsights } from "@vercel/speed-insights/react";  // ✅ 添加 Speed Insights
 
 import "./App.css";
 import { getAuth } from "firebase/auth";
 
 function App() {
   const [coinsData, setCoinsData] = useState([]);
-
   const [selectedCoin, setSelectedCoin] = useState(null);
 
   const handleCoinSelect = (coin) => {
@@ -55,6 +55,9 @@ function App() {
           </Routes>
         </div>
       </div>
+
+      {/* ✅ 添加 Speed Insights 监控性能 */}
+      <SpeedInsights />
     </div>
   );
 }
