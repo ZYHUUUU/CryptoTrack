@@ -43,7 +43,8 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^9.16.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "eslint": "^8.57.1",
     "rimraf": "^6.0.1",
     "svgo": "^3.3.2"
   }
