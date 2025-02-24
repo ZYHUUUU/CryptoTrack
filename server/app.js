@@ -9,12 +9,19 @@ app.use(cors());
 app.use(express.json());
 
 // 读取 Redis 连接信息
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379'; // 本地开发默认使用 localhost:6379
+const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
+const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || YkGCegni6k8T8nw3kxELDREfQd3G4Wst; // 如果 Redis 需要密码
 
 const redisClient = redis.createClient({
-    url: REDIS_URL
+    socket: {
+        host: REDIS_HOST,
+        port: REDIS_PORT,
+    },
+    password: REDIS_PASSWORD || undefined, // 仅当密码存在时才传入
 });
 
+// 监听 Redis 连接错误
 redisClient.on('error', (err) => {
     console.error('❌ Redis connection error:', err);
 });
@@ -22,7 +29,7 @@ redisClient.on('error', (err) => {
 (async () => {
     try {
         await redisClient.connect();
-        console.log('✅ Connected to Redis!');
+        console.log(`✅ Connected to Redis at ${REDIS_HOST}:${REDIS_PORT}`);
     } catch (error) {
         console.error('❌ Failed to connect to Redis:', error);
     }
@@ -63,6 +70,7 @@ app.use("/prices", (req, res, next) => {
     next();
 }, priceRoutes);
 
+// 服务器启动
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
 });
