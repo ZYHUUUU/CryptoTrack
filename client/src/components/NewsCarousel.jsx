@@ -8,7 +8,7 @@ const NewsBoard = () => {
     const intervalRef = useRef(null);
 
     useEffect(() => {
-        console.log("🔍 API URL:", process.env.REACT_APP_API_URL); // 确保 API 地址正确
+        console.log("🔍 API URL:", process.env.REACT_APP_API_URL);
 
         const fetchNews = async () => {
             try {
@@ -87,7 +87,6 @@ const NewsBoard = () => {
                     marginBottom: "1rem",
                 }}
             >
-                <h2 style={{ marginRight: "0.5rem" }}>Top News</h2>
             </div>
             <div>
                 {currentNews.length > 0 ? (

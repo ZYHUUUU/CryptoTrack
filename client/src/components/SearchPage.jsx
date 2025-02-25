@@ -52,6 +52,7 @@ const SearchPage = () => {
   const handleOptionClick = (selectedCoin) => {
     setCoin(selectedCoin.name);
     setShowDropdown(false);
+    navigate(`/coin/${selectedCoin.id}`); // 直接跳转到该币种详情页面
   };
 
   useEffect(() => {

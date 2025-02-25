@@ -33,7 +33,7 @@ function App() {
       <div className="news-trending-container">
         {/* 🔹 新闻板块 */}
         <div className="news-section">
-          <h2>News Section</h2>
+          <h2>Top News</h2>
           <NewsCarousel />
         </div>
   
