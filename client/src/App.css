@@ -1,13 +1,62 @@
+/* font */
+@font-face {
+  font-family: 'Orbitron';
+  src: url('./assets/fonts/Orbitron-Regular.ttf') format('truetype'); /* ✅ 让 Webpack 解析 */
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Orbitron';
+  src: url('./assets/fonts/Orbitron-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+
 body {
   margin: 0;
   padding: 0;
-  background-color: #000;
-  color: #fff;
-  font-family: Arial, sans-serif;
+  background-color: #000; /* 备用背景色，防止图片加载失败 */
+  /* font-family: Arial, sans-serif; */
+  font-family: 'Orbitron', sans-serif;
   height: 100vh;
   box-sizing: border-box;
   overflow-x: hidden;
+  position: relative; /* ✅ 确保 `body` 作为参考点 */
 }
+
+/* ✅ 让背景图片透明，而不影响内容 */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../public/background.jpg"); /* ✅ 确保正确路径 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.3; /* ✅ 让背景透明 */
+  pointer-events: none; /* ✅ 防止影响鼠标交互 */
+}
+
+/* ✅ 确保 `news-section` 和 `trending-coins` 不透明 */
+.news-section,
+.trending-coins {
+  background-color: rgba(30, 30, 30, 0.95); /* ✅ 让内容区恢复不透明 */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  position: relative; /* ✅ 让内容区在背景之上 */
+  z-index: 10; /* ✅ 确保它们在背景图片之上 */
+}
+
+
+
+
+
 
 html {
   height: 100%;
@@ -25,11 +74,12 @@ html {
   background-color: #111;
 }
 
+/* 搜索栏 */
 .top-bar {
-  position: absolute;
-  top: 21%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative; /* 取消 absolute，避免漂移 */
+  width: 80%; /* 让搜索栏占据屏幕的 80% */
+  max-width: 900px; /* 限制最大宽度，避免过宽 */
+  margin: 0 auto; /* 水平居中 */
   background-color: #222;
   color: #fff;
   display: flex;
@@ -41,60 +91,78 @@ html {
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  width: 800px;
-  margin-bottom: 20px;
 }
 
+
 .search-input {
-  width: 80%;
-  height: 30px;
-  padding: 5px 10px;
+  flex: 1; /* 让输入框自动适应剩余空间 */
+  height: 40px;
+  padding: 5px 15px;
   font-size: 16px;
   border: 1px solid #444;
-  border-radius: 5px;
-  margin-right: 10px;
+  border-radius: 5px 0 0 5px; /* 让左边圆角 */
   background-color: #333;
   color: #fff;
 }
 
 .search-button {
-  background-color: #444;
+  background-color: #007bff;
   color: #fff;
   border: none;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 0 5px 5px 0; /* 让右边圆角 */
   cursor: pointer;
   font-size: 16px;
   transition: background-color 0.3s;
 }
 
 .search-button:hover {
-  background-color: #555;
+  background-color: #0056b3;
 }
 
-.news-content-layout {
+
+
+
+/* 父容器 */
+.news-trending-container {
   display: flex;
-  margin-left: 240px;
-  align-items: flex-start;
-  gap: 40px;
-  width: 100%;
-  margin-top: 350px;
-  padding: 0 0px;
+  justify-content: space-between; /* 让两个部分并列 */
+  align-items: flex-start; /* 顶部对齐 */
+  width: 90%; /* 总宽度占屏幕 80% */
+  margin: 0 auto; /* 水平居中 */
+  gap: 3%; /* 两个板块之间的间距 */
 }
 
+/* 新闻板块 */
 .news-section {
-  position: absolute;
-  top: 71%;
-  left: 9%;
-  transform: translateY(-50%);
+  flex: 1; /* 让它占 50% 空间 */
+  max-width: 30%; /* 防止它变太大 */
   background-color: #333;
   color: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  width: 400px;
-  height: 675px;
+  height: auto;
   overflow-y: auto;
+}
+
+.news-section h2 {
+  text-align: center; /* ✅ 让标题居中 */
+  width: 100%; /* 确保标题占满父容器 */
+  margin-bottom: 10px; /* 适当调整底部间距 */
+}
+
+
+/* 货币板块 */
+.trending-coins {
+  /* font-family: Arial, sans-serif; */
+  flex: 1; /* 让它占 50% 空间 */
+  max-width: 70%; /* 防止它变太大 */
+  background-color: #222;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .news-section ul {
@@ -102,30 +170,29 @@ html {
   list-style-type: none;
 }
 
-.news-section li {
+.news-section li, 
+.news-section li * {
   margin-bottom: 10px;
   line-height: 1.5;
 }
 
-.content {
-  margin-left: 255px;
-  background-color: #000;
-  padding: 20px;
-  border-radius: 8px;
-  width: calc(100% - 320px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  transform: scale(0.68);
-  transform-origin: top center;
+/* 新闻字体 */
+.news-section li,
+.news-section li *,
+.news-section div,
+.news-section div * {
+  font-family: Arial, sans-serif !important;
 }
 
 .coins-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 自适应列数 */
   gap: 20px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
 
 .coin-item {
   background-color: #333;
@@ -163,6 +230,11 @@ html {
   background-color: #cccccc;
   cursor: not-allowed;
 }
+
+
+
+
+
 
 .menu-container {
   position: fixed;

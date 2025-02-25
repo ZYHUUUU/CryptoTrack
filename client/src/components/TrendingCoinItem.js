@@ -13,19 +13,13 @@ const TrendingCoinItem = ({ coin }) => {
         <br />
         <strong style={{ color: "#00FF00" }}>{coin.item.symbol.toUpperCase()}</strong>
         <br />
-        Price (USD): {formatNumber(coin.item.data?.price)}
+        Price (USD): {formatNumber(coin.item.data?.price.toFixed(2))}
         <br />
-        Market Cap: {coin.item.data?.market_cap || "N/A"}
-        <br />
-        24h Change (USD): {coin.item.data?.price_change_percentage_24h?.usd 
+        24h Change: {coin.item.data?.price_change_percentage_24h?.usd 
           ? `${coin.item.data.price_change_percentage_24h.usd.toFixed(2)}%`
           : "N/A"}
         <br />
-        Trading Volume (USD): 
-        <br />
-        {coin.item.data?.total_volume || "N/A"}
-        <br />
-        <p style={{ textAlign: "center", margin: "5px 0", color: "#fff" }}>7 Days Price Trend:</p>
+        <p style={{ textAlign: "center", margin: "5px 0", color: "#fff" }}></p>
         <img
           src={coin.item.data.sparkline}
           alt={`${coin.item.name} price trend`}

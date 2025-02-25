@@ -36,7 +36,7 @@ function TrendingCoins() {
   return (
     <div className="coins-container">
       <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
-        <h2 style={{ margin: 0 }}>Trending Coins</h2>
+        <h2 style={{ margin: 0 }}>15 Trending Coins</h2>
         <button className="refresh-button" onClick={fetchTrendingCoins} disabled={loading}>
           {loading ? "Refreshing..." : "Refresh Data"}
         </button>

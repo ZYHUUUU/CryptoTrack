@@ -88,11 +88,6 @@ const NewsBoard = () => {
                 }}
             >
                 <h2 style={{ marginRight: "0.5rem" }}>Top News</h2>
-                <img
-                    src="/default-crypto-news.jpg"
-                    alt="Top News Icon"
-                    style={{ width: "24px", height: "24px" }}
-                />
             </div>
             <div>
                 {currentNews.length > 0 ? (

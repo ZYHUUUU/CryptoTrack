@@ -28,12 +28,17 @@ function App() {
       <div className="top-bar">
         <SearchPage setCoinsData={setCoinsData} />
       </div>
-      <div className="news-content-layout">
+  
+      {/* ✅ 让 News 和 Trending Coins 并列 */}
+      <div className="news-trending-container">
+        {/* 🔹 新闻板块 */}
         <div className="news-section">
           <h2>News Section</h2>
           <NewsCarousel />
         </div>
-        <div className="content">
+  
+        {/* 🔹 交易趋势板块，修正 className */}
+        <div className="trending-coins">
           {selectedCoin && (
             <div className="favourite-button-container">
               <FavouriteButton coinId={coinsData} />
@@ -55,11 +60,12 @@ function App() {
           </Routes>
         </div>
       </div>
-
+  
       {/* ✅ 添加 Speed Insights 监控性能 */}
       <SpeedInsights />
     </div>
   );
+  
 }
 
 export default App;
