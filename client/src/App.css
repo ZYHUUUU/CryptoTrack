@@ -232,6 +232,28 @@ html {
 }
 
 
+@media (max-width: 768px) {
+  .news-trending-container {
+    flex-direction: column;  /* 竖向排列 */
+    align-items: center;  /* 居中对齐 */
+  }
+
+  .news-section {
+    width: 100%;  /* 占满屏幕 */
+    max-width: 100%;
+    height: 300px; /* 调整合适的高度 */
+  }
+
+  .trending-coins {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+
+
+
+
 
 
 

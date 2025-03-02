@@ -4,8 +4,27 @@ import axios from 'axios';
 const NewsBoard = () => {
     const [news, setNews] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
+    const [articlesPerPage, setArticlesPerPage] = useState(5); // 默认 PC 端每页 5 条
     const [hovered, setHovered] = useState(false);
     const intervalRef = useRef(null);
+
+    // 监听屏幕宽度，动态调整每页新闻数量
+    useEffect(() => {
+        const updateArticlesPerPage = () => {
+            if (window.innerWidth <= 768) {
+                setArticlesPerPage(2); // 移动端每页 2 条
+            } else {
+                setArticlesPerPage(5); // PC 端每页 5 条
+            }
+        };
+
+        window.addEventListener("resize", updateArticlesPerPage);
+        updateArticlesPerPage(); // 初始化时调用
+
+        return () => {
+            window.removeEventListener("resize", updateArticlesPerPage);
+        };
+    }, []);
 
     useEffect(() => {
         console.log("🔍 API URL:", process.env.REACT_APP_API_URL);
@@ -13,7 +32,7 @@ const NewsBoard = () => {
         const fetchNews = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/news`);
-                console.log("📰 News API Response:", response.data); // 观察 API 响应数据
+                console.log("📰 News API Response:", response.data);
 
                 if (Array.isArray(response.data)) {
                     setNews(response.data);
@@ -30,7 +49,7 @@ const NewsBoard = () => {
         fetchNews();
     }, []);
 
-    const totalPages = Math.ceil(news.length / 5);
+    const totalPages = Math.ceil(news.length / articlesPerPage);
 
     const startAutoSlide = useCallback(() => {
         intervalRef.current = setInterval(() => {
@@ -63,7 +82,7 @@ const NewsBoard = () => {
         goToPage((currentPage + 1) % totalPages);
     };
 
-    const currentNews = news.slice(currentPage * 5, currentPage * 5 + 5);
+    const currentNews = news.slice(currentPage * articlesPerPage, currentPage * articlesPerPage + articlesPerPage);
 
     return (
         <div
@@ -80,14 +99,6 @@ const NewsBoard = () => {
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "1rem",
-                }}
-            >
-            </div>
             <div>
                 {currentNews.length > 0 ? (
                     currentNews.map((item, index) => (
