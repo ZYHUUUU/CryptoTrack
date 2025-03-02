@@ -23,8 +23,8 @@ const TrendingCoinItem = ({ coin }) => {
         <img
           src={coin.item.data.sparkline}
           alt={`${coin.item.name} price trend`}
-          width="150"
-          height="40"
+          width="120"
+          height="55"
         />
       </li>
     </Link>

@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -9,6 +10,10 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
+
+const CACHE_KEY_INFO = "coin_info_cache";
+const CACHE_KEY_DATA = "coin_chart_cache";
+const CACHE_EXPIRY = 10 * 60 * 1000; // 10 分钟缓存
 
 const Page = () => {
   const { coinId } = useParams();
@@ -28,80 +33,111 @@ const Page = () => {
     { title: "Trading Volume Trends", dataKey: "volume", data: volumeData, color: "#0000FF" },
   ];
 
-  useEffect(() => {
-    const fetchCoinInfo = async () => {
-      try {
-        const response = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}`);
-        const data = await response.json();
-        setCoinInfo({
-          name: data.name,
-          symbol: data.symbol.toUpperCase(),
-          image: data.image.large,
-        });
-      } catch (error) {
-        console.error("Error fetching coin info:", error);
+  // ✅ 提取缓存数据的函数
+  const loadFromCache = (key) => {
+    const cachedData = localStorage.getItem(key);
+    if (cachedData) {
+      const { data, timestamp } = JSON.parse(cachedData);
+      if (Date.now() - timestamp < CACHE_EXPIRY) {
+        console.log(`📦 加载缓存数据 (${key})`);
+        return data;
       }
-    };
+    }
+    return null;
+  };
 
-    const fetchChartData = async () => {
-      const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart`;
-      const options = {
-        method: "GET",
-        headers: { accept: "application/json" },
-      };
+  // ✅ 获取 `Coin` 详细信息
+  const fetchCoinInfo = async () => {
+    const cacheKey = `${CACHE_KEY_INFO}_${coinId}`;
+    const cachedInfo = loadFromCache(cacheKey);
+    if (cachedInfo) {
+      setCoinInfo(cachedInfo);
+      return;
+    }
 
-      setLoading(true);
-      setError(false);
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/coins/${coinId}`);
+      const data = await response.json();
+      setCoinInfo({ name: data.name, symbol: data.symbol.toUpperCase(), image: data.image.large });
+      localStorage.setItem(cacheKey, JSON.stringify({ data, timestamp: Date.now() }));
+    } catch (error) {
+      console.error("❌ 获取 Coin 详细信息失败:", error);
+    }
+  };
 
-      try {
-        const response = await fetch(`${url}?vs_currency=usd&days=${timeRange}`, options);
+  // ✅ 获取 `Chart` 数据
+  const fetchChartData = async () => {
+    setLoading(true);
+    setError(false);
+
+    const cacheKey = `${CACHE_KEY_DATA}_${coinId}_${timeRange}`;
+    const cachedData = localStorage.getItem(cacheKey);
+
+    // ✅ 先检查缓存是否有效
+    if (cachedData) {
+        const { data, timestamp } = JSON.parse(cachedData);
+        if (Date.now() - timestamp < CACHE_EXPIRY) {
+            console.log("📦 使用缓存数据，避免 API 请求");
+            setChartData(data.chartData);
+            setMarketCapData(data.marketCapData);
+            setVolumeData(data.volumeData);
+            setLoading(false);
+            return;
+        }
+    }
+
+    // ✅ 只在缓存过期时请求 API
+    try {
+        console.log("🌐 请求 API:", `$${process.env.REACT_APP_API_URL}/coins/${coinId}/market_chart?vs_currency=usd&days=${timeRange}`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/coins/${coinId}/market_chart?vs_currency=usd&days=${timeRange}`);
+        
+        console.log("📊 API 响应状态:", response.status);
+        if (!response.ok) throw new Error(`API 请求失败: ${response.status}`);
+
         const data = await response.json();
         if (!data.prices) throw new Error("No data available");
 
-        setChartData(
-          data.prices.map(([timestamp, price]) => ({
-            time: timestamp,
-            price: parseFloat(price.toFixed(3)),
-          }))
-        );
+        const formattedData = {
+            chartData: data.prices.map(([t, p]) => ({ time: t, price: parseFloat(p.toFixed(3)) })),
+            marketCapData: data.market_caps.map(([t, m]) => ({ time: t, marketCap: parseFloat(m.toFixed(3)) })),
+            volumeData: data.total_volumes.map(([t, v]) => ({ time: t, volume: parseFloat(v.toFixed(3)) })),
+        };
 
-        setMarketCapData(
-          data.market_caps.map(([timestamp, marketCap]) => ({
-            time: timestamp,
-            marketCap: parseFloat(marketCap.toFixed(3)),
-          }))
-        );
+        setChartData(formattedData.chartData);
+        setMarketCapData(formattedData.marketCapData);
+        setVolumeData(formattedData.volumeData);
 
-        setVolumeData(
-          data.total_volumes.map(([timestamp, volume]) => ({
-            time: timestamp,
-            volume: parseFloat(volume.toFixed(3)),
-          }))
-        );
-
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching chart data:", error);
+        // ✅ 更新缓存
+        localStorage.setItem(cacheKey, JSON.stringify({ data: formattedData, timestamp: Date.now() }));
+    } catch (error) {
+        console.error("❌ 获取图表数据失败:", error);
         setError(true);
-        setLoading(false);
-      }
-    };
+    }
+    setLoading(false);
+};
 
-    fetchCoinInfo();
-    fetchChartData();
-  }, [coinId, timeRange]);
+
 
   const formatXAxis = (time) => {
     const date = new Date(time);
     if (timeRange === "1") {
-      return `${date.getHours()}:00`;
+        return `${date.getHours()}:00`; // 显示小时
     } else if (timeRange === "7" || timeRange === "30") {
-      return `${date.getMonth() + 1}/${date.getDate()}`;
+        return `${date.getMonth() + 1}/${date.getDate()}`; // 显示 月/日
     } else if (timeRange === "365") {
-      return date.toLocaleString("en", { month: "short" });
+        return date.toLocaleString("en", { month: "short" }); // 显示月份
     }
     return time;
-  };
+};
+
+
+  // ✅ 确保 `useEffect` 放在 return 语句之前
+  useEffect(() => {
+    if (!coinId) return; // 确保 coinId 存在，否则不请求 API
+    fetchCoinInfo();
+    fetchChartData();
+  }, [coinId, timeRange]); // 只有 coinId 或 timeRange 变化时才执行
+
 
   const handlePreviousChart = () => {
     setCurrentChartIndex((prevIndex) => (prevIndex === 0 ? charts.length - 1 : prevIndex - 1));
@@ -116,11 +152,7 @@ const Page = () => {
   }
 
   if (error) {
-    return (
-      <div style={{ color: "red", textAlign: "center" }}>
-        Failed to fetch chart data. Please try again.
-      </div>
-    );
+    return <div style={{ color: "red", textAlign: "center" }}>Failed to fetch chart data. Please try again.</div>;
   }
 
   return (
@@ -326,3 +358,7 @@ const Page = () => {
 };
 
 export default Page;
+
+
+
+  

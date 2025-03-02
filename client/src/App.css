@@ -128,9 +128,9 @@ html {
   display: flex;
   justify-content: space-between; /* 让两个部分并列 */
   align-items: flex-start; /* 顶部对齐 */
-  width: 90%; /* 总宽度占屏幕 80% */
+  width: 85%; /* 总宽度占屏幕*/
   margin: 0 auto; /* 水平居中 */
-  gap: 3%; /* 两个板块之间的间距 */
+  gap: 2%; /* 两个板块之间的间距 */
 }
 
 /* 新闻板块 */
