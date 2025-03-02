@@ -236,6 +236,7 @@ html {
   .news-trending-container {
     flex-direction: column;  /* 竖向排列 */
     align-items: center;  /* 居中对齐 */
+    gap:20px;
   }
 
   .news-section {
@@ -437,22 +438,32 @@ html {
   transform: translateY(0);
 }
 
-@media (max-width: 480px) {
+/* ✅ 1. 让 modal-content 在小屏幕下不超出屏幕 */
+@media (max-width: 768px) {
   .modal-content {
-    padding: 20px;
-    font-size: 14px;
+    width: 90%;  /* 让宽度适应小屏幕 */
+    max-width: 350px;
+    padding: 15px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden; /* ✅ 防止内容超出 */
   }
 
-  .modal-content button {
-    padding: 10px;
-    font-size: 14px;
+  /* ✅ 2. 移除横向滚动条 */
+  body {
+    overflow-x: hidden; /* ✅ 确保 body 不出现滚动条 */
   }
 
-  .modal-content input {
-    padding: 10px;
-    font-size: 14px;
+  /* ✅ 3. 让 modal 不会导致滚动 */
+  .modal-overlay {
+    overflow: hidden; /* ✅ 让背景层不滚动 */
   }
 }
+
+
+
 
 .assets-calculator-overlay {
   position: fixed;
